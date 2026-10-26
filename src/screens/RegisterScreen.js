@@ -11,6 +11,8 @@ import {
     View,
 } from 'react-native';
 import { register } from '../firebase/authService';
+import { db } from '../firebase/firebase';
+import { doc, setDoc } from 'firebase/firestore';
 import { styles } from '../styles/RegisterStyles';
 
 const firebaseMessages = {
@@ -21,6 +23,7 @@ const firebaseMessages = {
 
 export default function RegisterScreen({ navigation }) {
     // Guardamos los datos que escribe el alumno en el formulario.
+    const [nombre, setNombre] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -28,8 +31,8 @@ export default function RegisterScreen({ navigation }) {
 
     const handleRegister = async () => {
         // No intentamos registrar usuarios con campos vacíos.
-        if (!email.trim() || !password) {
-            Alert.alert('Faltan datos', 'Completa el correo y la contraseña.');
+        if (!nombre.trim() || !email.trim() || !password) {
+            Alert.alert('Faltan datos', 'Completa el nombre, correo y contraseña.');
             return;
         }
 
@@ -42,7 +45,14 @@ export default function RegisterScreen({ navigation }) {
         setLoading(true);
         try {
             // Firebase crea la cuenta y también inicia la sesión.
-            await register(email.trim(), password);
+            const userCredential = await register(email.trim(), password);
+            
+            // Crear el perfil en Firestore
+            await setDoc(doc(db, 'users', userCredential.user.uid), {
+                nombre: nombre.trim(),
+                email: email.trim(),
+                createdAt: new Date(),
+            });
         } catch (error) {
             Alert.alert('Firebase Auth', firebaseMessages[error.code] || 'No se pudo crear la cuenta.');
         } finally {
@@ -67,6 +77,16 @@ export default function RegisterScreen({ navigation }) {
                 </View>
 
                 <View style={styles.form}>
+                    <Text style={styles.label}>Nombre</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Tu nombre completo"
+                        placeholderTextColor="#94a3b8"
+                        autoCapitalize="words"
+                        value={nombre}
+                        onChangeText={setNombre}
+                    />
+
                     <Text style={styles.label}>Correo electrónico</Text>
                     <TextInput
                         style={styles.input}

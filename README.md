@@ -1,4 +1,4 @@
-# 📱 ExpoApp - Autenticación con Firebase
+# 📱 ExpoApp-segundoCuatrimestre
 
 Una aplicación móvil desarrollada con **React Native** y **Expo (SDK 54)**, que implementa un sistema de autenticación de usuarios (registro, inicio de sesión y persistencia de estado) utilizando **Firebase Authentication** y navegación dinámica con **React Navigation**.
 

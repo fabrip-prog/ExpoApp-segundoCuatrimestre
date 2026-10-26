@@ -1,48 +1,21 @@
 import { useEffect, useState } from 'react';
 
-import {
-    ActivityIndicator,
-    StyleSheet,
-    View,
-} from 'react-native';
-
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
-import { onAuthStateChanged } from 'firebase/auth';
-
-import { auth } from '../firebase/firebase';
+import { useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
+import LocationScreen from '../screens/LocationScreen';
 
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
-    const [user, setUser] = useState(null);
-    const [checkingSession, setCheckingSession] = useState(true);
-
-    useEffect(() => {
-        // Escucha los cambios en el estado de autenticación de Firebase.
-        const unsubscribe = onAuthStateChanged(
-            auth,
-            currentUser => {
-                if (currentUser) {
-                    console.log('Usuario autenticado');
-                } else {
-                    console.log('Sin usuario');
-                }
-
-                setUser(currentUser);
-                setCheckingSession(false);
-            },
-        );
-
-        return unsubscribe;
-    }, []);
+    const { user, checkingSession } = useContext(AuthContext);
 
     if (checkingSession) {
         return (
@@ -73,6 +46,16 @@ export default function AppNavigator() {
                     <Stack.Screen
                         name="Perfil"
                         component={ProfileScreen}
+                    />
+
+                    <Stack.Screen
+                        name="Ubicacion"
+                        component={LocationScreen}
+                    />
+
+                    <Stack.Screen
+                        name="Location"
+                        component={LocationScreen}
                     />
                 </Stack.Navigator>
             ) : (
